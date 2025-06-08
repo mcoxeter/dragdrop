@@ -1,0 +1,76 @@
+import React from 'react';
+import './App.css';
+import { DragProvider, useDragContext } from './components/drag-context';
+import { Dragable } from './components/draggable';
+
+function App() {
+  const [items, setItems] = React.useState<Item[]>(getItems());
+  return (
+    <DragProvider
+      onReorder={(move) => {
+        const newItems = [...items];
+        const [movedItem] = newItems.splice(move.sourceIndex, 1);
+        newItems.splice(move.targetIndex, 0, movedItem);
+        setItems(newItems);
+      }}
+    >
+      {items.map((item, index) => (
+        <Dragable key={item.id} index={index} maxIndex={items.length}>
+          <MyItem item={item} />
+        </Dragable>
+      ))}
+      <Diasnostics />
+    </DragProvider>
+  );
+}
+
+function Diasnostics() {
+  const context = useDragContext();
+  if (context.reorder === undefined) {
+    return null;
+  }
+  return (
+    <div>
+      <h2>Dragging</h2>
+      <div>
+        <strong>Move Source:</strong> {context.reorder.sourceIndex}
+      </div>
+      <div>
+        <strong>Move Target:</strong>{' '}
+        {`${context.reorder.targetIndex} ${context.reorder.targetSide}`}
+      </div>
+    </div>
+  );
+}
+
+function MyItem({ item }: { item: Item }) {
+  return (
+    <div
+      style={{
+        border: '1px solid #ddd',
+        padding: '4px',
+        minWidth: '100px',
+        backgroundColor: 'white'
+      }}
+    >
+      {item.name}
+    </div>
+  );
+}
+
+type Item = {
+  id: string;
+  name: string;
+};
+
+const getItems = (): Item[] => {
+  return [
+    { id: '1', name: 'Item 1' },
+    { id: '2', name: 'Item 2' },
+    { id: '3', name: 'Item 3' },
+    { id: '4', name: 'Item 4' },
+    { id: '5', name: 'Item 5' }
+  ];
+};
+
+export default App;
