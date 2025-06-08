@@ -1,0 +1,62 @@
+.draggable {
+  position: relative;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+  
+  &:focus-visible {
+    outline: 2px solid var(--focus-color, #0066cc);
+    outline-offset: 2px;
+  }
+
+  &.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.over {
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--drop-indicator-color, #0066cc);
+      z-index: 2;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.handleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: var(--handle-color, #666);
+  
+  &:hover {
+    color: var(--handle-hover-color, #333);
+  }
+}
+
+.content {
+  flex: 1;
+  min-width: 0; // Ensure text truncation works
+}

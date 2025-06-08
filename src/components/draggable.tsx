@@ -36,58 +36,59 @@ export const Dragable = ({ children, index }: DragableProps) => {
 
   const reordering = context.reorder ? styles.reordering : '';
   return (
-    <div
-      ref={ref}
-      className={`${styles.component} ${reordering}`}
-      data-component={componmentName}
-      draggable
-      tabIndex={0}
-      onDragStart={() => {
-        context.setReorder((prev) => {
-          return {
-            sourceIndex: index,
-            targetIndex: prev?.targetIndex ?? index
-          };
-        });
-      }}
-      onDragEnter={(e) => {
-        console.log('enter' + e.currentTarget.getBoundingClientRect().height);
-        context.setReorder((prev) => {
-          return {
-            sourceIndex: prev?.sourceIndex ?? index,
-            targetIndex: index
-          };
-        });
-      }}
-      onDragOver={handleDragOver}
-      onDrop={(e) => {
-        e.preventDefault();
-        setTimeout(() => {
-          context.setReorder(undefined);
-        }, 100);
-        if (context.onReorder) {
-          context.onReorder({
-            sourceIndex: context.reorder?.sourceIndex ?? index,
-            targetIndex: index
-          });
-        }
-      }}
-      onKeyUp={() =>
-        // Enter or Space starts the drag
-        // Enter or Space ends the drag
-        // Escape cancels the drag
-        // Arrow keys move the drag
-        {}
-      }
-      style={{
-        cursor: 'grab',
-        position: 'relative'
-      }}
-    >
+    <>
       <InsertLine index={index} moveTargetSide={'before'} />
-      {children}
+      <div
+        ref={ref}
+        className={`${styles.component} ${reordering}`}
+        data-component={componmentName}
+        draggable
+        tabIndex={0}
+        onDragStart={() => {
+          context.setReorder((prev) => {
+            return {
+              sourceIndex: index,
+              targetIndex: prev?.targetIndex ?? index
+            };
+          });
+        }}
+        onDragEnter={(e) => {
+          context.setReorder((prev) => {
+            return {
+              sourceIndex: prev?.sourceIndex ?? index,
+              targetIndex: index
+            };
+          });
+        }}
+        onDragOver={handleDragOver}
+        onDrop={(e) => {
+          e.preventDefault();
+
+          context.setReorder(undefined);
+
+          if (context.onReorder) {
+            context.onReorder({
+              sourceIndex: context.reorder?.sourceIndex ?? index,
+              targetIndex: index
+            });
+          }
+        }}
+        onKeyUp={() =>
+          // Enter or Space starts the drag
+          // Enter or Space ends the drag
+          // Escape cancels the drag
+          // Arrow keys move the drag
+          {}
+        }
+        style={{
+          cursor: 'grab',
+          position: 'relative'
+        }}
+      >
+        {children}
+      </div>
       <InsertLine index={index} moveTargetSide={'after'} />
-      {context.reorder && context.reorder?.sourceIndex === index && (
+      {/* {context.reorder && context.reorder?.sourceIndex === index && (
         <div
           style={{
             position: 'absolute',
@@ -99,8 +100,8 @@ export const Dragable = ({ children, index }: DragableProps) => {
             pointerEvents: 'none' // allows clicks to pass through if needed
           }}
         />
-      )}
-    </div>
+      )} */}
+    </>
   );
 };
 
