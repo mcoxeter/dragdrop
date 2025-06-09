@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './draggable.module.scss';
 import type { DraggableTexts } from './draggable';
 import { formatText } from '../../utils/i18n-utils';
-import { useDragContext } from '../drag-context';
 
 type DraggableItemProps = {
   /** Index of the item */
