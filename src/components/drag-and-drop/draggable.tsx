@@ -64,7 +64,8 @@ export function Draggable({
   disabled = false,
   'data-testid': testId,
   texts = {}
-}: DraggableProps) {  // Context and derived state
+}: DraggableProps) {
+  // Context and derived state
   const context = useDragContext();
   const isDragging = context.reorder?.sourceIndex === index;
   const isOver = context.reorder?.targetIndex === index;
@@ -73,7 +74,7 @@ export function Draggable({
   const finalTexts = React.useMemo<Required<DraggableTexts>>(
     () => ({ ...defaultTexts, ...texts }),
     [texts]
-  );  // Drag state management helpers
+  ); // Drag state management helpers
   const startDragging = React.useCallback(() => {
     context.setReorder({ sourceIndex: index, targetIndex: index });
   }, [context, index]);
