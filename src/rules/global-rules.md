@@ -125,6 +125,7 @@
       ```
 
 12. **Documentation**
+
     - Add JSDoc comments for component props
     - Document complex logic or business rules
     - Include usage examples in component docs
@@ -136,6 +137,9 @@
        * @returns {JSX.Element} The rendered button
        */
       ```
+
+13. **I18n**
+    - All text strings used in components should be possible to provide via props, they should have sensible defaults if not provided.
 
 ## Example Component Structure
 
