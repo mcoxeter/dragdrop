@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDragContext } from '../drag-context';
+import { useDragContext } from './drag-context';
 import { DraggableItem } from './draggable-item';
 import { ScreenReaderAnnouncements } from './screen-reader-announcements';
 
@@ -64,12 +64,13 @@ export function Draggable({
   disabled = false,
   'data-testid': testId,
   texts = {}
-}: DraggableProps) {  // Component state
+}: DraggableProps) {
+  // Component state
   const [isDragging, setIsDragging] = React.useState(false);
   // Context and refs
   const context = useDragContext();
   const elementRef = React.useRef<HTMLDivElement>(null);
-  
+
   // Derive isOver state from context
   const isOver = context.reorder?.targetIndex === index;
 

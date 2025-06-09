@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { DragProvider } from '../../drag-context';
+import { DragProvider } from '../drag-context';
 
 export const defaultProps = {
   index: 0,

@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css';
-import { DragProvider, useDragContext } from './components/drag-context';
+import {
+  DragProvider,
+  useDragContext
+} from './components/drag-and-drop/drag-context';
 import { Draggable } from './components/drag-and-drop/draggable';
 
 function App() {

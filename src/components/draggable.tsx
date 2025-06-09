@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDragContext } from './drag-context';
+import { useDragContext } from './drag-and-drop/drag-context';
 import styles from './draggable.module.scss';
 
 export type DragableProps = {
