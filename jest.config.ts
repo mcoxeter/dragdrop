@@ -11,7 +11,7 @@ const config: Config = {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest'
   },
-  testMatch: ['**/__tests__/**/*.(ts|tsx)', '**/?(*.)+(spec|test).(ts|tsx)']
+  testMatch: ['**/?(*.)+(spec|test).(ts|tsx)']
 };
 
 export default config;

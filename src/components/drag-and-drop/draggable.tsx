@@ -130,12 +130,12 @@ export function Draggable({
       if (context.onReorder) {
         context.onReorder({
           sourceIndex: reorder.sourceIndex,
-          targetIndex: index
+          targetIndex: reorder.targetIndex
         });
       }
       context.setReorder(undefined);
     },
-    [context, index]
+    [context]
   );
 
   const handleKeyDown = React.useCallback(
