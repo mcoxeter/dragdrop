@@ -32,8 +32,6 @@ type DraggableItemProps = {
   onDragEnd: () => void;
   /** Drag over handler */
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-  /** Drag leave handler */
-  onDragLeave: () => void;
   /** Drop handler */
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   /** Key down handler */
@@ -58,7 +56,6 @@ export function DraggableItem({
   onDragStart,
   onDragEnd,
   onDragOver,
-  onDragLeave,
   onDrop,
   onKeyDown
 }: DraggableItemProps) {
@@ -106,7 +103,6 @@ export function DraggableItem({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
       onDrop={onDrop}
       onKeyDown={onKeyDown}
     >

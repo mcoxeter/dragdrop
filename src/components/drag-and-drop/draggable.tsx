@@ -64,14 +64,14 @@ export function Draggable({
   disabled = false,
   'data-testid': testId,
   texts = {}
-}: DraggableProps) {
-  // Component state
+}: DraggableProps) {  // Component state
   const [isDragging, setIsDragging] = React.useState(false);
-  const [isOver, setIsOver] = React.useState(false);
-
   // Context and refs
   const context = useDragContext();
   const elementRef = React.useRef<HTMLDivElement>(null);
+  
+  // Derive isOver state from context
+  const isOver = context.reorder?.targetIndex === index;
 
   // Memoized texts to prevent unnecessary re-renders
   const finalTexts = React.useMemo<Required<DraggableTexts>>(
@@ -88,7 +88,6 @@ export function Draggable({
 
   const handleDragEnd = React.useCallback(() => {
     setIsDragging(false);
-    setIsOver(false);
     context.setReorder(undefined);
   }, [context]);
 
@@ -106,18 +105,12 @@ export function Draggable({
         targetIndex: index,
         targetSide
       }));
-      setIsOver(true);
     },
     [context, disabled, index]
   );
-  const handleDragLeave = React.useCallback(() => {
-    setIsOver(false);
-  }, []);
-
   const handleDrop = React.useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      setIsOver(false);
       setIsDragging(false);
 
       const reorder = context.reorder;
@@ -218,7 +211,6 @@ export function Draggable({
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onKeyDown={handleKeyDown}
       >
