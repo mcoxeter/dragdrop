@@ -64,27 +64,21 @@ export function Draggable({
   disabled = false,
   'data-testid': testId,
   texts = {}
-}: DraggableProps) {
-  // Component state
-  const [isDragging, setIsDragging] = React.useState(false); // Context
+}: DraggableProps) {  // Context and derived state
   const context = useDragContext();
-
-  // Derive isOver state from context
+  const isDragging = context.reorder?.sourceIndex === index;
   const isOver = context.reorder?.targetIndex === index;
 
   // Memoized texts to prevent unnecessary re-renders
   const finalTexts = React.useMemo<Required<DraggableTexts>>(
     () => ({ ...defaultTexts, ...texts }),
     [texts]
-  );
-  // Drag state management helpers
+  );  // Drag state management helpers
   const startDragging = React.useCallback(() => {
-    setIsDragging(true);
     context.setReorder({ sourceIndex: index, targetIndex: index });
   }, [context, index]);
 
   const endDragging = React.useCallback(() => {
-    setIsDragging(false);
     context.setReorder(undefined);
   }, [context]);
 
