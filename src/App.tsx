@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { DragProvider, useDragContext } from './components/drag-context';
-import { Dragable } from './components/draggable';
+import { Draggable } from './components/drag-and-drop/draggable';
 
 function App() {
   const [items, setItems] = React.useState<Item[]>(getItems());
@@ -15,9 +15,9 @@ function App() {
       }}
     >
       {items.map((item, index) => (
-        <Dragable key={item.id} index={index} maxIndex={items.length}>
+        <Draggable key={item.id} index={index} maxIndex={items.length}>
           <MyItem item={item} />
-        </Dragable>
+        </Draggable>
       ))}
       <Diasnostics />
     </DragProvider>

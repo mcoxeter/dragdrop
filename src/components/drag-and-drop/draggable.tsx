@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDragContext } from '../drag-context';
-import { DragHandle } from './drag-handle';
 import { DraggableItem } from './draggable-item';
 import { ScreenReaderAnnouncements } from './screen-reader-announcements';
 
@@ -49,8 +48,6 @@ export type DraggableProps = {
   disabled?: boolean;
   /** Test ID for testing purposes */
   'data-testid'?: string;
-  /** Optional drag handle component */
-  dragHandle?: React.ReactNode;
   /** Optional customization of component text strings */
   texts?: DraggableTexts;
 };
@@ -66,7 +63,6 @@ export function Draggable({
   className,
   disabled = false,
   'data-testid': testId,
-  dragHandle,
   texts = {}
 }: DraggableProps) {
   // Component state
@@ -191,13 +187,6 @@ export function Draggable({
     ]
   );
 
-  // Wrap children with drag handle if provided
-  const wrappedChildren = dragHandle ? (
-    <DragHandle>{dragHandle}</DragHandle>
-  ) : (
-    children
-  );
-
   return (
     <>
       <ScreenReaderAnnouncements
@@ -224,7 +213,7 @@ export function Draggable({
         onDrop={handleDrop}
         onKeyDown={handleKeyDown}
       >
-        {wrappedChildren}
+        {children}
       </DraggableItem>
     </>
   );
