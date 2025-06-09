@@ -21,11 +21,8 @@ type DraggableItemProps = {
   /** Whether item is being dragged over */
   isOver: boolean;
   /** The current drop position */
-  dropPosition: 'before' | 'after' | null;
-  /** Text configuration */
+  dropPosition: 'before' | 'after' | null /** Text configuration */;
   texts: Required<DraggableTexts>;
-  /** Reference to the draggable element */
-  elementRef: React.RefObject<HTMLDivElement | null>;
   /** Drag start handler */
   onDragStart: () => void;
   /** Drag end handler */
@@ -52,7 +49,6 @@ export function DraggableItem({
   isOver,
   dropPosition,
   texts,
-  elementRef,
   onDragStart,
   onDragEnd,
   onDragOver,
@@ -86,10 +82,8 @@ export function DraggableItem({
     },
     [index, maxIndex]
   );
-
   return (
     <div
-      ref={elementRef}
       className={classNames}
       draggable={!disabled}
       data-testid={testId}

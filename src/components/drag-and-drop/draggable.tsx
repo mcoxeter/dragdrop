@@ -66,10 +66,8 @@ export function Draggable({
   texts = {}
 }: DraggableProps) {
   // Component state
-  const [isDragging, setIsDragging] = React.useState(false);
-  // Context and refs
+  const [isDragging, setIsDragging] = React.useState(false); // Context
   const context = useDragContext();
-  const elementRef = React.useRef<HTMLDivElement>(null);
 
   // Derive isOver state from context
   const isOver = context.reorder?.targetIndex === index;
@@ -79,18 +77,26 @@ export function Draggable({
     () => ({ ...defaultTexts, ...texts }),
     [texts]
   );
+  // Drag state management helpers
+  const startDragging = React.useCallback(() => {
+    setIsDragging(true);
+    context.setReorder({ sourceIndex: index, targetIndex: index });
+  }, [context, index]);
+
+  const endDragging = React.useCallback(() => {
+    setIsDragging(false);
+    context.setReorder(undefined);
+  }, [context]);
 
   // Event handlers
   const handleDragStart = React.useCallback(() => {
     if (disabled) return;
-    setIsDragging(true);
-    context.setReorder({ sourceIndex: index, targetIndex: index });
-  }, [context, disabled, index]);
+    startDragging();
+  }, [disabled, startDragging]);
 
   const handleDragEnd = React.useCallback(() => {
-    setIsDragging(false);
-    context.setReorder(undefined);
-  }, [context]);
+    endDragging();
+  }, [endDragging]);
 
   const handleDragOver = React.useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -108,24 +114,46 @@ export function Draggable({
       }));
     },
     [context, disabled, index]
-  );
+  ); // Reordering logic
+  const commitReorder = React.useCallback(() => {
+    const reorder = context.reorder;
+    if (!reorder || reorder.sourceIndex === reorder.targetIndex) return;
+
+    context.onReorder?.({
+      sourceIndex: reorder.sourceIndex,
+      targetIndex: reorder.targetIndex
+    });
+    endDragging();
+  }, [context, endDragging]);
+
   const handleDrop = React.useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      setIsDragging(false);
-
-      const reorder = context.reorder;
-      if (!reorder || reorder.sourceIndex === reorder.targetIndex) return;
-
-      if (context.onReorder) {
-        context.onReorder({
-          sourceIndex: reorder.sourceIndex,
-          targetIndex: reorder.targetIndex
-        });
-      }
-      context.setReorder(undefined);
+      commitReorder();
     },
-    [context]
+    [commitReorder]
+  );
+
+  // Navigation helpers
+  const handleArrowNavigation = React.useCallback(
+    (direction: 'up' | 'down') => {
+      const sourceIndex = context.reorder?.sourceIndex ?? index;
+      const currentPosition = context.reorder?.targetIndex ?? sourceIndex;
+
+      const newIndex =
+        direction === 'up'
+          ? Math.max(0, currentPosition - 1)
+          : Math.min(maxIndex - 1, currentPosition + 1);
+
+      if (newIndex !== currentPosition) {
+        context.setReorder((prev) => ({
+          sourceIndex: prev?.sourceIndex ?? sourceIndex,
+          targetIndex: newIndex,
+          targetSide: direction === 'up' ? 'before' : 'after'
+        }));
+      }
+    },
+    [context, index, maxIndex]
   );
 
   const handleKeyDown = React.useCallback(
@@ -135,57 +163,36 @@ export function Draggable({
       switch (e.key) {
         case ' ':
         case 'Enter':
+          e.preventDefault();
           if (isDragging) {
-            e.preventDefault();
-            handleDrop(e as unknown as React.DragEvent<HTMLDivElement>);
+            commitReorder();
           } else {
-            e.preventDefault();
-            handleDragStart();
+            startDragging();
           }
           break;
 
         case 'Escape':
           if (isDragging) {
             e.preventDefault();
-            handleDragEnd();
+            endDragging();
           }
           break;
         case 'ArrowUp':
         case 'ArrowDown':
           if (isDragging) {
             e.preventDefault();
-
-            // Get the actual source index from context to ensure we're using the current position
-            const sourceIndex = context.reorder?.sourceIndex ?? index;
-            const currentPosition = context.reorder?.targetIndex ?? sourceIndex;
-
-            // Calculate the new target position
-            const newIndex =
-              e.key === 'ArrowUp'
-                ? Math.max(0, currentPosition - 1)
-                : Math.min(maxIndex - 1, currentPosition + 1);
-
-            // Only update if we can actually move to the new position
-            if (newIndex !== currentPosition) {
-              context.setReorder((prev) => ({
-                sourceIndex: prev?.sourceIndex ?? sourceIndex,
-                targetIndex: newIndex,
-                targetSide: e.key === 'ArrowUp' ? 'before' : 'after'
-              }));
-            }
+            handleArrowNavigation(e.key === 'ArrowUp' ? 'up' : 'down');
           }
           break;
       }
     },
     [
-      context,
       disabled,
-      handleDragEnd,
-      handleDragStart,
-      handleDrop,
-      index,
       isDragging,
-      maxIndex
+      endDragging,
+      startDragging,
+      commitReorder,
+      handleArrowNavigation
     ]
   );
 
@@ -208,7 +215,6 @@ export function Draggable({
         isOver={isOver}
         dropPosition={context.reorder?.targetSide ?? null}
         texts={finalTexts}
-        elementRef={elementRef}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}

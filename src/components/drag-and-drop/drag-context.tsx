@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 
 export type targetSideType = 'before' | 'after';
@@ -9,13 +8,8 @@ export type Reorder = {
   targetSide?: targetSideType;
 };
 
-export type ReorderCommand = {
-  sourceIndex: number;
-  targetIndex: number;
-};
-
 export type DragContextType = {
-  onReorder?: (move: ReorderCommand) => void;
+  onReorder?: (move: Pick<Reorder, 'sourceIndex' | 'targetIndex'>) => void;
   reorder?: Reorder;
   setReorder: React.Dispatch<React.SetStateAction<Reorder | undefined>>;
 };
@@ -32,7 +26,7 @@ export function useDragContext() {
 
 export type DragProviderProps = {
   children: React.ReactNode;
-  onReorder?: (move: ReorderCommand) => void;
+  onReorder?: (move: Pick<Reorder, 'sourceIndex' | 'targetIndex'>) => void;
 };
 export function DragProvider({ children, onReorder }: DragProviderProps) {
   const [reorder, setReorder] = React.useState<Reorder | undefined>(undefined);
