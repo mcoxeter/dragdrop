@@ -20,6 +20,8 @@ type DraggableItemProps = {
   isDragging: boolean;
   /** Whether item is being dragged over */
   isOver: boolean;
+  /** The current drop position */
+  dropPosition: 'before' | 'after' | null;
   /** Text configuration */
   texts: Required<DraggableTexts>;
   /** Reference to the draggable element */
@@ -50,6 +52,7 @@ export function DraggableItem({
   className,
   isDragging,
   isOver,
+  dropPosition,
   texts,
   elementRef,
   onDragStart,
@@ -66,12 +69,14 @@ export function DraggableItem({
         styles.draggable,
         isDragging && styles.dragging,
         isOver && styles.over,
+        isOver && dropPosition === 'before' && styles['over-before'],
+        isOver && dropPosition === 'after' && styles['over-after'],
         disabled && styles.disabled,
         className
       ]
         .filter(Boolean)
         .join(' '),
-    [isDragging, isOver, disabled, className]
+    [isDragging, isOver, dropPosition, disabled, className]
   );
 
   // Apply template helper

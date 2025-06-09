@@ -68,6 +68,9 @@ export function Draggable({
   // Component state
   const [isDragging, setIsDragging] = React.useState(false);
   const [isOver, setIsOver] = React.useState(false);
+  const [dropPosition, setDropPosition] = React.useState<
+    'before' | 'after' | null
+  >(null);
 
   // Context and refs
   const context = useDragContext();
@@ -88,6 +91,8 @@ export function Draggable({
 
   const handleDragEnd = React.useCallback(() => {
     setIsDragging(false);
+    setIsOver(false);
+    setDropPosition(null);
     context.setReorder(undefined);
   }, [context]);
 
@@ -106,12 +111,13 @@ export function Draggable({
         targetSide
       }));
       setIsOver(true);
+      setDropPosition(targetSide);
     },
     [context, disabled, index]
   );
-
   const handleDragLeave = React.useCallback(() => {
     setIsOver(false);
+    setDropPosition(null);
   }, []);
 
   const handleDrop = React.useCallback(
@@ -119,6 +125,7 @@ export function Draggable({
       e.preventDefault();
       setIsOver(false);
       setIsDragging(false);
+      setDropPosition(null);
 
       const reorder = context.reorder;
       if (!reorder || reorder.sourceIndex === reorder.targetIndex) return;
@@ -204,6 +211,7 @@ export function Draggable({
         className={className}
         isDragging={isDragging}
         isOver={isOver}
+        dropPosition={dropPosition}
         texts={finalTexts}
         elementRef={elementRef}
         onDragStart={handleDragStart}
