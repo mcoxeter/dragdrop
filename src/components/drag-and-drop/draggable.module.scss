@@ -4,7 +4,7 @@
   touch-action: none;
   cursor: grab;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
 
   &:focus-visible {
     outline: 2px solid var(--focus-color, #4314de);
