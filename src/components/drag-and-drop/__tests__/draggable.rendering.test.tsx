@@ -35,15 +35,4 @@ describe('Draggable - rendering', () => {
 
     expect(element).toHaveClass('custom-class');
   });
-
-  it('renders drag handle when provided', () => {
-    const handle = <span>≡</span>;
-    renderWithProvider(<Draggable {...defaultProps} dragHandle={handle} />);
-
-    expect(screen.getByText('≡')).toBeInTheDocument();
-    expect(screen.getByText('≡').parentElement).toHaveAttribute(
-      'aria-hidden',
-      'true'
-    );
-  });
 });

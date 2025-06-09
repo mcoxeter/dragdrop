@@ -162,22 +162,28 @@ export function Draggable({
             e.preventDefault();
             handleDragEnd();
           }
-          break;
-
-        case 'ArrowUp':
+          break;        case 'ArrowUp':
         case 'ArrowDown':
           if (isDragging) {
             e.preventDefault();
-            const newIndex =
-              e.key === 'ArrowUp'
-                ? Math.max(0, index - 1)
-                : Math.min(maxIndex - 1, index + 1);
+            
+            // Get the actual source index from context to ensure we're using the current position
+            const sourceIndex = context.reorder?.sourceIndex ?? index;
+            const currentPosition = context.reorder?.targetIndex ?? sourceIndex;
+            
+            // Calculate the new target position
+            const newIndex = e.key === 'ArrowUp'
+              ? Math.max(0, currentPosition - 1)
+              : Math.min(maxIndex - 1, currentPosition + 1);
 
-            context.setReorder((prev) => ({
-              sourceIndex: prev?.sourceIndex ?? index,
-              targetIndex: newIndex,
-              targetSide: e.key === 'ArrowUp' ? 'before' : 'after'
-            }));
+            // Only update if we can actually move to the new position
+            if (newIndex !== currentPosition) {
+              context.setReorder((prev) => ({
+                sourceIndex: prev?.sourceIndex ?? sourceIndex,
+                targetIndex: newIndex,
+                targetSide: e.key === 'ArrowUp' ? 'before' : 'after'
+              }));
+            }
           }
           break;
       }
