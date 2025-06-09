@@ -68,9 +68,6 @@ export function Draggable({
   // Component state
   const [isDragging, setIsDragging] = React.useState(false);
   const [isOver, setIsOver] = React.useState(false);
-  const [dropPosition, setDropPosition] = React.useState<
-    'before' | 'after' | null
-  >(null);
 
   // Context and refs
   const context = useDragContext();
@@ -92,7 +89,6 @@ export function Draggable({
   const handleDragEnd = React.useCallback(() => {
     setIsDragging(false);
     setIsOver(false);
-    setDropPosition(null);
     context.setReorder(undefined);
   }, [context]);
 
@@ -111,13 +107,11 @@ export function Draggable({
         targetSide
       }));
       setIsOver(true);
-      setDropPosition(targetSide);
     },
     [context, disabled, index]
   );
   const handleDragLeave = React.useCallback(() => {
     setIsOver(false);
-    setDropPosition(null);
   }, []);
 
   const handleDrop = React.useCallback(
@@ -125,7 +119,6 @@ export function Draggable({
       e.preventDefault();
       setIsOver(false);
       setIsDragging(false);
-      setDropPosition(null);
 
       const reorder = context.reorder;
       if (!reorder || reorder.sourceIndex === reorder.targetIndex) return;
@@ -162,19 +155,21 @@ export function Draggable({
             e.preventDefault();
             handleDragEnd();
           }
-          break;        case 'ArrowUp':
+          break;
+        case 'ArrowUp':
         case 'ArrowDown':
           if (isDragging) {
             e.preventDefault();
-            
+
             // Get the actual source index from context to ensure we're using the current position
             const sourceIndex = context.reorder?.sourceIndex ?? index;
             const currentPosition = context.reorder?.targetIndex ?? sourceIndex;
-            
+
             // Calculate the new target position
-            const newIndex = e.key === 'ArrowUp'
-              ? Math.max(0, currentPosition - 1)
-              : Math.min(maxIndex - 1, currentPosition + 1);
+            const newIndex =
+              e.key === 'ArrowUp'
+                ? Math.max(0, currentPosition - 1)
+                : Math.min(maxIndex - 1, currentPosition + 1);
 
             // Only update if we can actually move to the new position
             if (newIndex !== currentPosition) {
@@ -217,7 +212,7 @@ export function Draggable({
         className={className}
         isDragging={isDragging}
         isOver={isOver}
-        dropPosition={dropPosition}
+        dropPosition={context.reorder?.targetSide ?? null}
         texts={finalTexts}
         elementRef={elementRef}
         onDragStart={handleDragStart}
