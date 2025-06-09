@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './draggable.module.scss';
-import { formatText } from '../../utils/i18n-utils';
 import { useDragContext } from '../drag-context';
-import type { Reorder } from '../drag-context';
+import { DragHandle } from './drag-handle';
+import { DraggableItem } from './draggable-item';
+import { ScreenReaderAnnouncements } from './screen-reader-announcements';
 
 /**
  * Interface for customizable text strings used in the component
@@ -83,7 +83,7 @@ export function Draggable({
     [texts]
   );
 
-  // Mouse event handlers
+  // Event handlers
   const handleDragStart = React.useCallback(() => {
     if (disabled) return;
     setIsDragging(true);
@@ -138,7 +138,6 @@ export function Draggable({
     [context, index]
   );
 
-  // Keyboard event handlers
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (disabled) return;
@@ -192,60 +191,32 @@ export function Draggable({
     ]
   );
 
-  // Class names for different states
-  const classNames = React.useMemo(
-    () =>
-      [
-        styles.draggable,
-        isDragging && styles.dragging,
-        isOver && styles.over,
-        disabled && styles.disabled,
-        className
-      ]
-        .filter(Boolean)
-        .join(' '),
-    [isDragging, isOver, disabled, className]
-  );
-
-  // Helper for screen reader text
-  const getStatusText = React.useCallback(() => {
-    if (isDragging) return finalTexts.itemBeingDragged;
-    if (isOver) return finalTexts.dropPositionAvailable;
-    return finalTexts.pressToStartDragging;
-  }, [isDragging, isOver, finalTexts]);
-
-  // Apply template helper
-  const applyTemplate = React.useCallback(
-    (template: string) => {
-      return formatText(template, {
-        index: index + 1,
-        total: maxIndex
-      });
-    },
-    [index, maxIndex]
+  // Wrap children with drag handle if provided
+  const wrappedChildren = dragHandle ? (
+    <DragHandle>{dragHandle}</DragHandle>
+  ) : (
+    children
   );
 
   return (
     <>
-      <div
-        id={`drag-instructions-${index}`}
-        className={styles.visuallyHidden}
-        aria-hidden='true'
-      >
-        {getStatusText()}
-      </div>
-      <div
-        ref={elementRef}
-        className={classNames}
-        draggable={!disabled}
+      <ScreenReaderAnnouncements
+        index={index}
+        maxIndex={maxIndex}
+        isDragging={isDragging}
+        isOver={isOver}
+        texts={finalTexts}
+      />
+      <DraggableItem
+        index={index}
+        maxIndex={maxIndex}
+        disabled={disabled}
         data-testid={testId}
-        data-index={index}
-        tabIndex={disabled ? -1 : 0}
-        role='button'
-        aria-label={applyTemplate(finalTexts.itemPositionTemplate)}
-        aria-roledescription={finalTexts.draggableItemDescription}
-        aria-describedby={`drag-instructions-${index}`}
-        aria-grabbed={isDragging}
+        className={className}
+        isDragging={isDragging}
+        isOver={isOver}
+        texts={finalTexts}
+        elementRef={elementRef}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
@@ -253,22 +224,8 @@ export function Draggable({
         onDrop={handleDrop}
         onKeyDown={handleKeyDown}
       >
-        {dragHandle ? (
-          <div className={styles.handleContainer}>
-            <div className={styles.handle} aria-hidden='true'>
-              {dragHandle}
-            </div>
-            <div className={styles.content}>{children}</div>
-          </div>
-        ) : (
-          children
-        )}
-      </div>
-      {isDragging && (
-        <div role='status' aria-live='polite' className={styles.visuallyHidden}>
-          {applyTemplate(finalTexts.draggingStatusTemplate)}
-        </div>
-      )}
+        {wrappedChildren}
+      </DraggableItem>
     </>
   );
 }
