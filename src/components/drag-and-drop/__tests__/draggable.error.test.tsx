@@ -68,7 +68,7 @@ describe('Draggable - error handling', () => {
 
   it('should handle missing onReorder callback', () => {
     // Render without onReorder callback
-    const { container } = render(
+    render(
       <DragProvider>
         <Draggable index={0} maxIndex={1}>
           Test Item
