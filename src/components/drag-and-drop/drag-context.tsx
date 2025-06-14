@@ -25,7 +25,8 @@ export type DragContextType = {
   moveDragItem(direction: InsertType): void;
   getDropInsertPosition(listIndex: number): InsertType;
   getNumberOfItems(): number;
-  // getDragItemInfo
+  getDragOverInfo(): DragOverOperation | null;
+  getDragOperation(): DragOperation | null;
 };
 
 const DragContext = React.createContext<DragContextType | null>(null);
@@ -129,6 +130,14 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
     return items.length;
   };
 
+  const getDragOverInfo = (): DragOverOperation | null => {
+    return dragOverOperation;
+  };
+
+  const getDragOperation = (): DragOperation | null => {
+    return dragOperation;
+  };
+
   React.useEffect(() => {
     setItemOrders(createInitialOrders(items));
   }, [items]);
@@ -143,7 +152,9 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
         isDragItem,
         moveDragItem,
         getDropInsertPosition,
-        getNumberOfItems
+        getNumberOfItems,
+        getDragOverInfo,
+        getDragOperation
       }}
     >
       {children}

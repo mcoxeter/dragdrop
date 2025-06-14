@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './draggable.module.scss';
 import type { DraggableTexts } from './draggable';
-import { formatText } from '../../utils/i18n-utils';
 import { useDragContext } from './drag-context';
 
 type DraggableItemProps = {
@@ -60,16 +59,6 @@ export function DraggableItem({
     [context, indexInList, disabled]
   );
 
-  // Apply template helper
-  const applyTemplate = React.useCallback(
-    (template: string) => {
-      return formatText(template, {
-        index: indexInList + 1,
-        total: context.getNumberOfItems()
-      });
-    },
-    [indexInList, context]
-  );
   return (
     <div
       className={classNames}
@@ -77,9 +66,9 @@ export function DraggableItem({
       data-index={indexInList}
       tabIndex={disabled ? -1 : 0}
       role='button'
-      aria-label={applyTemplate(texts.itemPositionTemplate)}
+      aria-label={context.isDragItem(indexInList) ? texts.itemBeingDragged : ''}
       aria-roledescription={texts.draggableItemDescription}
-      aria-describedby={`drag-instructions-${indexInList}`}
+      aria-describedby={`drag-instructions`}
       aria-grabbed={context.isDragItem(indexInList)}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}

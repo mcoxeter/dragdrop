@@ -1,7 +1,7 @@
 import React from 'react';
 import { InsertType, useDragContext } from './drag-context';
 import { DraggableItem } from './draggable-item';
-import { ScreenReaderAnnouncements } from './screen-reader-announcements';
+import { defaultTexts } from './default-texts';
 
 /**
  * Interface for customizable text strings used in the component
@@ -20,16 +20,6 @@ export interface DraggableTexts {
   /** Description for draggable items */
   draggableItemDescription?: string;
 }
-
-// Default text strings
-const defaultTexts: Required<DraggableTexts> = {
-  itemBeingDragged: 'Item is being dragged',
-  dropPositionAvailable: 'Drop position available',
-  pressToStartDragging: 'Press space bar to start dragging',
-  itemPositionTemplate: 'Draggable item {index} of {total}',
-  draggingStatusTemplate: 'Item {index} being dragged {direction}',
-  draggableItemDescription: 'draggable item'
-};
 
 /**
  * Props interface for the Draggable component
@@ -54,17 +44,17 @@ export type DraggableProps = {
 export function Draggable({
   indexInList,
   children,
-  disabled = false,
-  texts = {}
+  texts,
+  disabled = false
 }: DraggableProps) {
   // Context and derived state
   const context = useDragContext();
 
-  // Memoized texts to prevent unnecessary re-renders
   const finalTexts = React.useMemo<Required<DraggableTexts>>(
     () => ({ ...defaultTexts, ...texts }),
     [texts]
   );
+
   const startDragging = React.useCallback(
     () => context.applyDragStart(indexInList),
     [context, indexInList]
@@ -137,20 +127,17 @@ export function Draggable({
   );
 
   return (
-    <>
-      <ScreenReaderAnnouncements indexInList={indexInList} texts={finalTexts} />
-      <DraggableItem
-        indexInList={indexInList}
-        disabled={disabled}
-        texts={finalTexts}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onKeyDown={handleKeyDown}
-      >
-        {children}
-      </DraggableItem>
-    </>
+    <DraggableItem
+      indexInList={indexInList}
+      disabled={disabled}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onKeyDown={handleKeyDown}
+      texts={finalTexts}
+    >
+      {children}
+    </DraggableItem>
   );
 }
