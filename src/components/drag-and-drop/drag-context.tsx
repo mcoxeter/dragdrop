@@ -3,10 +3,10 @@ import React from 'react';
 import {
   createDragOperation,
   createDragOverOperation,
-  shouldUpdateDragOver,
-  updateItemOrders,
+  canDragOver,
+  updateDraggedItemsSortValueInItemOrders,
   reorderItems,
-  calculateMoveDragItem,
+  keyboardMoveDragItem,
   isDraggingItem,
   getDropPosition,
   createInitialOrders
@@ -73,15 +73,23 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
     dragOverIndex: number,
     side?: targetSideType
   ): void => {
-    const newOperation = createDragOverOperation(dragOverIndex, itemOrders, side);
-    if (shouldUpdateDragOver(newOperation, dragOperation, dragOverOperation)) {
-      setDragOverOperation(newOperation);
+    const newDragOverOperation = createDragOverOperation(
+      dragOverIndex,
+      itemOrders,
+      side
+    );
+    if (canDragOver(newDragOverOperation, dragOperation, dragOverOperation)) {
+      setDragOverOperation(newDragOverOperation);
     }
   };
 
   const applyDrop = (): void => {
     if (dragOperation && dragOverOperation) {
-      const newOrders = updateItemOrders(dragOperation, dragOverOperation, itemOrders);
+      const newOrders = updateDraggedItemsSortValueInItemOrders(
+        itemOrders,
+        dragOperation.dragIndex,
+        dragOverOperation.newOrder
+      );
       setItemOrders(newOrders);
       setItems(reorderItems(items, newOrders));
       setDragOperation(null);
@@ -99,8 +107,8 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
 
     const currentIndex =
       dragOverOperation?.dragOverIndex ?? dragOperation.dragIndex;
-    
-    const newDragOverOp = calculateMoveDragItem(
+
+    const newDragOverOp = keyboardMoveDragItem(
       direction,
       currentIndex,
       itemOrders,

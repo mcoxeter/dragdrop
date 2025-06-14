@@ -77,7 +77,7 @@ export function createDragOverOperation(
 /**
  * Determines if drag over operation should be updated
  */
-export function shouldUpdateDragOver(
+export function canDragOver(
   newOperation: DragOverOperation,
   currentDragOp: DragOperation | null,
   currentDragOverOp: DragOverOperation | null
@@ -91,13 +91,13 @@ export function shouldUpdateDragOver(
 /**
  * Updates item orders based on drop operation
  */
-export function updateItemOrders(
-  dragOperation: DragOperation,
-  dragOverOperation: DragOverOperation,
-  itemOrders: ItemOrder[]
+export function updateDraggedItemsSortValueInItemOrders(
+  itemOrders: ItemOrder[],
+  dragItemIndex: number,
+  newOrder: number
 ): ItemOrder[] {
-  const copy = [...itemOrders];
-  copy[dragOperation.dragIndex].order = dragOverOperation.newOrder;
+  const copy = JSON.parse(JSON.stringify(itemOrders)) as ItemOrder[];
+  copy[dragItemIndex].order = newOrder;
   return copy.sort((a, b) => a.order - b.order);
 }
 
@@ -111,7 +111,7 @@ export function reorderItems<T>(items: T[], itemOrders: ItemOrder[]): T[] {
 /**
  * Calculates new position when moving item up/down
  */
-export function calculateMoveDragItem(
+export function keyboardMoveDragItem(
   direction: MoveDirectionType,
   currentIndex: number,
   itemOrders: ItemOrder[],
