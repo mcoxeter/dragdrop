@@ -131,12 +131,12 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
     if (!dragOverOperation) {
       return 'cant-insert-here';
     }
-    if (dragOverOperation.dragOverIndex === listIndex) {
+    if (dragOverOperation.dragOverIndex !== listIndex) {
       return 'cant-insert-here';
     }
     return dragOverOperation.newOrder < itemOrders[listIndex].order
-      ? 'insert-after'
-      : 'insert-before';
+      ? 'insert-before'
+      : 'insert-after';
   };
 
   const getNumberOfItems = (): number => {
