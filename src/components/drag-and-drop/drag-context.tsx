@@ -106,11 +106,13 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
   const moveDragItem = (direction: MoveDirectionType): void => {
     if (!dragOperation) return;
 
-    const currentIndex = dragOperation.dragIndex;
+    const currentIndex =
+      dragOverOperation?.dragOverIndex ?? dragOperation.dragIndex;
     const dragOverIndex =
       direction === 'up'
         ? Math.max(0, currentIndex - 1)
         : Math.min(items.length - 1, currentIndex + 1);
+    // console.log(
 
     if (dragOverIndex !== currentIndex) {
       setDragOverOperation({
