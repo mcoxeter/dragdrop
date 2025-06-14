@@ -17,9 +17,8 @@
     cursor: grabbing;
     z-index: 1001;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
-  // &.over {
 
   &.over-before::before,
   &.over-after::after {
@@ -43,7 +42,6 @@
   &.over-after::after {
     bottom: -1px;
   }
-  // }
 
   &.disabled {
     opacity: 0.5;

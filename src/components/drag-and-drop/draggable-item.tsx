@@ -13,14 +13,8 @@ type DraggableItemProps = {
   children: React.ReactNode;
   /** Whether dragging is disabled */
   disabled: boolean;
-  /** Optional CSS class name */
-  className?: string;
-  /** Whether item is being dragged */
-  // isDragging: boolean;
-  /** Whether item is being dragged over */
-  // isOver: boolean;
-  /** The current drop position */
-  // dropPosition: 'before' | 'after' | null /** Text configuration */;
+
+  /** a11y texts */
   texts: Required<DraggableTexts>;
   /** Drag start handler */
   onDragStart: () => void;
@@ -41,7 +35,6 @@ export function DraggableItem({
   indexInList,
   children,
   disabled,
-  className,
   texts,
   onDragStart,
   onDragEnd,
@@ -60,12 +53,11 @@ export function DraggableItem({
           styles['over-before'],
         context.getDropInsertPosition(indexInList) === 'insert-after' &&
           styles['over-after'],
-        disabled && styles.disabled,
-        className
+        disabled && styles.disabled
       ]
         .filter(Boolean)
         .join(' '),
-    [context, indexInList, disabled, className]
+    [context, indexInList, disabled]
   );
 
   // Apply template helper
@@ -82,7 +74,6 @@ export function DraggableItem({
     <div
       className={classNames}
       draggable={!disabled}
-      // data-testid={testId}
       data-index={indexInList}
       tabIndex={disabled ? -1 : 0}
       role='button'
