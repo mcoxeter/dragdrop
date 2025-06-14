@@ -21,7 +21,7 @@ describe('Draggable - performance', () => {
 
     const onReorder = jest.fn();
     renderWithProvider(
-      <Draggable index={0} maxIndex={1}>
+      <Draggable indexInList={0} maxIndex={1}>
         <TestChild />
       </Draggable>,
       onReorder
@@ -44,10 +44,10 @@ describe('Draggable - performance', () => {
     const onReorder = jest.fn();
     renderWithProvider(
       <>
-        <Draggable index={0} maxIndex={2}>
+        <Draggable indexInList={0} maxIndex={2}>
           Item 1
         </Draggable>
-        <Draggable index={1} maxIndex={2}>
+        <Draggable indexInList={1} maxIndex={2}>
           Item 2
         </Draggable>
       </>,
@@ -72,7 +72,7 @@ describe('Draggable - performance', () => {
   it('should cleanup properly on unmount', () => {
     const onReorder = jest.fn();
     const { unmount } = renderWithProvider(
-      <Draggable index={0} maxIndex={1}>
+      <Draggable indexInList={0} maxIndex={1}>
         Test Item
       </Draggable>,
       onReorder

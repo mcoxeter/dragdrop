@@ -2,16 +2,17 @@ import React from 'react';
 import styles from './draggable.module.scss';
 import { formatText } from '../../utils/i18n-utils';
 import type { DraggableTexts } from './draggable';
+import { useDragContext } from './drag-context';
 
 type ScreenReaderAnnouncementsProps = {
   /** Index of the item */
-  index: number;
+  indexInList: number;
   /** Total number of items */
-  maxIndex: number;
+  // maxIndex: number;
   /** Whether the item is being dragged */
-  isDragging: boolean;
+  // isDragging: boolean;
   /** Whether an item is being dragged over */
-  isOver: boolean;
+  // isOver: boolean;
   /** Text configuration */
   texts: Required<DraggableTexts>;
 };
@@ -20,40 +21,42 @@ type ScreenReaderAnnouncementsProps = {
  * Renders screen reader announcements for drag and drop operations
  */
 export function ScreenReaderAnnouncements({
-  index,
-  maxIndex,
-  isDragging,
-  isOver,
+  indexInList,
   texts
 }: ScreenReaderAnnouncementsProps) {
+  const context = useDragContext();
   // Helper for screen reader text
   const getStatusText = React.useCallback(() => {
-    if (isDragging) return texts.itemBeingDragged;
-    if (isOver) return texts.dropPositionAvailable;
+    // if (isDragging) return texts.itemBeingDragged;
+    if (context.isDragItem(indexInList)) return texts.itemBeingDragged;
+    // if (isOver) return texts.dropPositionAvailable;
+    if (context.getDropInsertPosition(indexInList) !== 'cant-insert-here') {
+      return texts.dropPositionAvailable;
+    }
     return texts.pressToStartDragging;
-  }, [isDragging, isOver, texts]);
+  }, [context, indexInList, texts]);
 
   // Helper for applying text templates
   const applyTemplate = React.useCallback(
     (template: string) => {
       return formatText(template, {
-        index: index + 1,
-        total: maxIndex
+        index: indexInList + 1,
+        total: context.getNumberOfItems()
       });
     },
-    [index, maxIndex]
+    [indexInList, context]
   );
 
   return (
     <>
       <div
-        id={`drag-instructions-${index}`}
+        id={`drag-instructions-${indexInList}`}
         className={styles.visuallyHidden}
         aria-hidden='true'
       >
         {getStatusText()}
       </div>
-      {isDragging && (
+      {context.isDragItem(indexInList) && (
         <div role='status' aria-live='polite' className={styles.visuallyHidden}>
           {applyTemplate(texts.draggingStatusTemplate)}
         </div>

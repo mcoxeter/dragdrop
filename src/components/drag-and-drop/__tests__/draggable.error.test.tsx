@@ -16,7 +16,7 @@ describe('Draggable - error handling', () => {
   it('should throw error when used outside DragProvider', () => {
     expect(() =>
       render(
-        <Draggable index={0} maxIndex={1}>
+        <Draggable indexInList={0} maxIndex={1}>
           Test Item
         </Draggable>
       )
@@ -26,7 +26,7 @@ describe('Draggable - error handling', () => {
   it('should handle invalid index values', () => {
     const onReorder = jest.fn();
     renderWithProvider(
-      <Draggable index={-1} maxIndex={1}>
+      <Draggable indexInList={-1} maxIndex={1}>
         Invalid Index
       </Draggable>,
       onReorder
@@ -45,10 +45,10 @@ describe('Draggable - error handling', () => {
     const onReorder = jest.fn();
     renderWithProvider(
       <>
-        <Draggable index={0} maxIndex={2}>
+        <Draggable indexInList={0} maxIndex={2}>
           First Item
         </Draggable>
-        <Draggable index={1} maxIndex={2}>
+        <Draggable indexInList={1} maxIndex={2}>
           Last Item
         </Draggable>
       </>,
@@ -70,7 +70,7 @@ describe('Draggable - error handling', () => {
     // Render without onReorder callback
     render(
       <DragProvider>
-        <Draggable index={0} maxIndex={1}>
+        <Draggable indexInList={0} maxIndex={1}>
           Test Item
         </Draggable>
       </DragProvider>

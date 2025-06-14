@@ -2,26 +2,25 @@ import React from 'react';
 import styles from './draggable.module.scss';
 import type { DraggableTexts } from './draggable';
 import { formatText } from '../../utils/i18n-utils';
+import { useDragContext } from './drag-context';
 
 type DraggableItemProps = {
   /** Index of the item */
-  index: number;
+  indexInList: number;
   /** Total number of items */
-  maxIndex: number;
+  // maxIndex: number;
   /** The content to make draggable */
   children: React.ReactNode;
   /** Whether dragging is disabled */
   disabled: boolean;
-  /** Test ID for testing */
-  'data-testid'?: string;
   /** Optional CSS class name */
   className?: string;
   /** Whether item is being dragged */
-  isDragging: boolean;
+  // isDragging: boolean;
   /** Whether item is being dragged over */
-  isOver: boolean;
+  // isOver: boolean;
   /** The current drop position */
-  dropPosition: 'before' | 'after' | null /** Text configuration */;
+  // dropPosition: 'before' | 'after' | null /** Text configuration */;
   texts: Required<DraggableTexts>;
   /** Drag start handler */
   onDragStart: () => void;
@@ -39,15 +38,10 @@ type DraggableItemProps = {
  * Core draggable item component that handles events and renders the draggable element
  */
 export function DraggableItem({
-  index,
-  maxIndex,
+  indexInList,
   children,
   disabled,
-  'data-testid': testId,
   className,
-  isDragging,
-  isOver,
-  dropPosition,
   texts,
   onDragStart,
   onDragEnd,
@@ -55,45 +49,47 @@ export function DraggableItem({
   onDrop,
   onKeyDown
 }: DraggableItemProps) {
+  const context = useDragContext();
   // Class names for different states
   const classNames = React.useMemo(
     () =>
       [
         styles.draggable,
-        isDragging && styles.dragging,
-        isOver && styles.over,
-        isOver && dropPosition === 'before' && styles['over-before'],
-        isOver && dropPosition === 'after' && styles['over-after'],
+        context.isDragItem(indexInList) && styles.dragging,
+        context.getDropInsertPosition(indexInList) === 'insert-before' &&
+          styles['over-before'],
+        context.getDropInsertPosition(indexInList) === 'insert-after' &&
+          styles['over-after'],
         disabled && styles.disabled,
         className
       ]
         .filter(Boolean)
         .join(' '),
-    [isDragging, isOver, dropPosition, disabled, className]
+    [context, indexInList, disabled, className]
   );
 
   // Apply template helper
   const applyTemplate = React.useCallback(
     (template: string) => {
       return formatText(template, {
-        index: index + 1,
-        total: maxIndex
+        index: indexInList + 1,
+        total: context.getNumberOfItems()
       });
     },
-    [index, maxIndex]
+    [indexInList, context]
   );
   return (
     <div
       className={classNames}
       draggable={!disabled}
-      data-testid={testId}
-      data-index={index}
+      // data-testid={testId}
+      data-index={indexInList}
       tabIndex={disabled ? -1 : 0}
       role='button'
       aria-label={applyTemplate(texts.itemPositionTemplate)}
       aria-roledescription={texts.draggableItemDescription}
-      aria-describedby={`drag-instructions-${index}`}
-      aria-grabbed={isDragging}
+      aria-describedby={`drag-instructions-${indexInList}`}
+      aria-grabbed={context.isDragItem(indexInList)}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
