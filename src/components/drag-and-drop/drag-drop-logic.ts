@@ -2,8 +2,6 @@ import type {
   DragOperation,
   DragOverOperation,
   ItemOrder,
-  MoveDirectionType,
-  targetSideType,
   InsertType
 } from './drag-context';
 
@@ -63,14 +61,15 @@ export function createDragOperation(dragIndex: number): DragOperation {
 export function createDragOverOperation(
   dragOverIndex: number,
   itemOrders: ItemOrder[],
-  side?: targetSideType
+  side: InsertType
 ): DragOverOperation {
   return {
     dragOverIndex,
     newOrder:
-      side === 'before'
+      side === 'insert-before'
         ? itemOrders[dragOverIndex].order - 1
-        : itemOrders[dragOverIndex].order + 1
+        : itemOrders[dragOverIndex].order + 1,
+    side
   };
 }
 
@@ -112,13 +111,13 @@ export function reorderItems<T>(items: T[], itemOrders: ItemOrder[]): T[] {
  * Calculates new position when moving item up/down
  */
 export function keyboardMoveDragItem(
-  direction: MoveDirectionType,
+  side: InsertType,
   currentIndex: number,
   itemOrders: ItemOrder[],
   maxIndex: number
 ): DragOverOperation | null {
   const dragOverIndex =
-    direction === 'up'
+    side === 'insert-before'
       ? Math.max(0, currentIndex - 1)
       : Math.min(maxIndex, currentIndex + 1);
 
@@ -129,9 +128,10 @@ export function keyboardMoveDragItem(
   return {
     dragOverIndex,
     newOrder:
-      direction === 'up'
+      side === 'insert-before'
         ? itemOrders[dragOverIndex].order - 1
-        : itemOrders[dragOverIndex].order + 1
+        : itemOrders[dragOverIndex].order + 1,
+    side
   };
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDragContext } from './drag-context';
+import { InsertType, useDragContext } from './drag-context';
 import { DraggableItem } from './draggable-item';
 import { ScreenReaderAnnouncements } from './screen-reader-announcements';
 
@@ -27,8 +27,7 @@ const defaultTexts: Required<DraggableTexts> = {
   dropPositionAvailable: 'Drop position available',
   pressToStartDragging: 'Press space bar to start dragging',
   itemPositionTemplate: 'Draggable item {index} of {total}',
-  draggingStatusTemplate:
-    'Item being dragged, current position {index} of {total}',
+  draggingStatusTemplate: 'Item {index} being dragged {direction}',
   draggableItemDescription: 'draggable item'
 };
 
@@ -89,7 +88,8 @@ export function Draggable({
       if (disabled) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const midpoint = rect.top + rect.height / 2;
-      const targetSide = e.clientY < midpoint ? 'before' : 'after';
+      const targetSide: InsertType =
+        e.clientY < midpoint ? 'insert-before' : 'insert-after';
       context.applyDragOver(indexInList, targetSide);
     },
     [context, disabled, indexInList]
@@ -126,7 +126,9 @@ export function Draggable({
         case 'ArrowDown':
           if (context.isDragItem(indexInList)) {
             e.preventDefault();
-            context.moveDragItem(e.key === 'ArrowUp' ? 'up' : 'down');
+            context.moveDragItem(
+              e.key === 'ArrowUp' ? 'insert-before' : 'insert-after'
+            );
           }
           break;
       }

@@ -12,21 +12,20 @@ import {
   createInitialOrders
 } from './drag-drop-logic';
 
-export type targetSideType = 'before' | 'after';
-
-export type MoveDirectionType = 'up' | 'down';
+// export type MoveDirectionType = 'up' | 'down';
 
 export type InsertType = 'insert-before' | 'insert-after' | 'cant-insert-here';
 
 export type DragContextType = {
   applyDrop(): void;
   applyDragStart(dragIndex: number): void;
-  applyDragOver(dragOverIndex: number, side?: targetSideType): void;
+  applyDragOver(dragOverIndex: number, side?: InsertType): void;
   cancelDrag(): void;
   isDragItem(listIndex: number): boolean;
-  moveDragItem(direction: MoveDirectionType): void;
+  moveDragItem(direction: InsertType): void;
   getDropInsertPosition(listIndex: number): InsertType;
   getNumberOfItems(): number;
+  // getDragItemInfo
 };
 
 const DragContext = React.createContext<DragContextType | null>(null);
@@ -57,6 +56,7 @@ export type DragOperation = {
 export type DragOverOperation = {
   dragOverIndex: number;
   newOrder: number;
+  side: InsertType;
 };
 export function DragProvider({ children, items, setItems }: DragProviderProps) {
   const [dragOperation, setDragOperation] =
@@ -69,10 +69,7 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
     setDragOperation(createDragOperation(dragIndex));
   };
 
-  const applyDragOver = (
-    dragOverIndex: number,
-    side?: targetSideType
-  ): void => {
+  const applyDragOver = (dragOverIndex: number, side: InsertType): void => {
     const newDragOverOperation = createDragOverOperation(
       dragOverIndex,
       itemOrders,
@@ -102,7 +99,7 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
     setDragOverOperation(null);
   };
 
-  const moveDragItem = (direction: MoveDirectionType): void => {
+  const moveDragItem = (direction: InsertType): void => {
     if (!dragOperation) return;
 
     const currentIndex =

@@ -7,12 +7,6 @@ import { useDragContext } from './drag-context';
 type ScreenReaderAnnouncementsProps = {
   /** Index of the item */
   indexInList: number;
-  /** Total number of items */
-  // maxIndex: number;
-  /** Whether the item is being dragged */
-  // isDragging: boolean;
-  /** Whether an item is being dragged over */
-  // isOver: boolean;
   /** Text configuration */
   texts: Required<DraggableTexts>;
 };

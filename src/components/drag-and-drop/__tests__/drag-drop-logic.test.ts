@@ -55,26 +55,29 @@ describe('drag-drop-logic', () => {
     ];
 
     it('should create before operation', () => {
-      const result = createDragOverOperation(1, itemOrders, 'before');
+      const result = createDragOverOperation(1, itemOrders, 'insert-before');
       expect(result).toEqual({
         dragOverIndex: 1,
-        newOrder: 2 // 3 - 1
+        newOrder: 2, // 3 - 1
+        side: 'insert-before'
       });
     });
 
     it('should create after operation', () => {
-      const result = createDragOverOperation(1, itemOrders, 'after');
+      const result = createDragOverOperation(1, itemOrders, 'insert-after');
       expect(result).toEqual({
         dragOverIndex: 1,
-        newOrder: 4 // 3 + 1
+        newOrder: 4, // 3 + 1,
+        side: 'insert-after'
       });
     });
 
     it('should default to after if no side specified', () => {
-      const result = createDragOverOperation(1, itemOrders);
+      const result = createDragOverOperation(1, itemOrders, 'insert-before');
       expect(result).toEqual({
         dragOverIndex: 1,
-        newOrder: 4
+        newOrder: 2,
+        side: 'insert-before'
       });
     });
   });
@@ -82,14 +85,16 @@ describe('drag-drop-logic', () => {
   describe('shouldUpdateDragOver', () => {
     const newOperation: DragOverOperation = {
       dragOverIndex: 1,
-      newOrder: 2
+      newOrder: 2,
+      side: 'insert-before'
     };
 
     it('should update when different index and order', () => {
       const currentDragOp: DragOperation = { dragIndex: 0 };
       const currentDragOverOp: DragOverOperation = {
         dragOverIndex: 0,
-        newOrder: 1
+        newOrder: 1,
+        side: 'insert-before'
       };
 
       expect(canDragOver(newOperation, currentDragOp, currentDragOverOp)).toBe(
@@ -101,7 +106,8 @@ describe('drag-drop-logic', () => {
       const currentDragOp: DragOperation = { dragIndex: 1 };
       const currentDragOverOp: DragOverOperation = {
         dragOverIndex: 1,
-        newOrder: 2
+        newOrder: 2,
+        side: 'insert-before'
       };
 
       expect(canDragOver(newOperation, currentDragOp, currentDragOverOp)).toBe(
@@ -125,7 +131,8 @@ describe('drag-drop-logic', () => {
       const dragOp: DragOperation = { dragIndex: 2 };
       const dragOverOp: DragOverOperation = {
         dragOverIndex: 0,
-        newOrder: 0
+        newOrder: 0,
+        side: 'insert-before'
       };
 
       const result = updateDraggedItemsSortValueInItemOrders(
@@ -143,7 +150,8 @@ describe('drag-drop-logic', () => {
       const dragOp: DragOperation = { dragIndex: 1 };
       const dragOverOp: DragOverOperation = {
         dragOverIndex: 2,
-        newOrder: 6
+        newOrder: 6,
+        side: 'insert-before'
       };
 
       const result = updateDraggedItemsSortValueInItemOrders(
@@ -183,28 +191,30 @@ describe('drag-drop-logic', () => {
     ];
 
     it('should move up within bounds', () => {
-      const result = keyboardMoveDragItem('up', 1, itemOrders, 2);
+      const result = keyboardMoveDragItem('insert-before', 1, itemOrders, 2);
       expect(result).toEqual({
         dragOverIndex: 0,
-        newOrder: 0
+        newOrder: 0,
+        side: 'insert-before'
       });
     });
 
     it('should move down within bounds', () => {
-      const result = keyboardMoveDragItem('down', 1, itemOrders, 2);
+      const result = keyboardMoveDragItem('insert-after', 1, itemOrders, 2);
       expect(result).toEqual({
         dragOverIndex: 2,
-        newOrder: 6
+        newOrder: 6,
+        side: 'insert-after'
       });
     });
 
     it('should return null when at top and moving up', () => {
-      const result = keyboardMoveDragItem('up', 0, itemOrders, 2);
+      const result = keyboardMoveDragItem('insert-before', 0, itemOrders, 2);
       expect(result).toBeNull();
     });
 
     it('should return null when at bottom and moving down', () => {
-      const result = keyboardMoveDragItem('down', 2, itemOrders, 2);
+      const result = keyboardMoveDragItem('insert-after', 2, itemOrders, 2);
       expect(result).toBeNull();
     });
   });
@@ -231,7 +241,8 @@ describe('drag-drop-logic', () => {
     it('should return insert-before when new order is less', () => {
       const dragOverOp: DragOverOperation = {
         dragOverIndex: 1,
-        newOrder: 2
+        newOrder: 2,
+        side: 'insert-before'
       };
       expect(getDropPosition(1, dragOverOp, itemOrders)).toBe('insert-before');
     });
@@ -239,7 +250,8 @@ describe('drag-drop-logic', () => {
     it('should return insert-after when new order is greater', () => {
       const dragOverOp: DragOverOperation = {
         dragOverIndex: 1,
-        newOrder: 4
+        newOrder: 4,
+        side: 'insert-before'
       };
       expect(getDropPosition(1, dragOverOp, itemOrders)).toBe('insert-after');
     });
@@ -251,7 +263,8 @@ describe('drag-drop-logic', () => {
     it('should return cant-insert-here when indices dont match', () => {
       const dragOverOp: DragOverOperation = {
         dragOverIndex: 0,
-        newOrder: 2
+        newOrder: 2,
+        side: 'insert-before'
       };
       expect(getDropPosition(1, dragOverOp, itemOrders)).toBe(
         'cant-insert-here'
