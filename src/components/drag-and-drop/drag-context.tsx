@@ -1,5 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
+import {
+  createDragOperation,
+  createDragOverOperation,
+  shouldUpdateDragOver,
+  updateItemOrders,
+  reorderItems,
+  calculateMoveDragItem,
+  isDraggingItem,
+  getDropPosition,
+  createInitialOrders
+} from './drag-drop-logic';
 
 export type targetSideType = 'before' | 'after';
 
@@ -50,49 +61,29 @@ export type DragOverOperation = {
 export function DragProvider({ children, items, setItems }: DragProviderProps) {
   const [dragOperation, setDragOperation] =
     React.useState<DragOperation | null>(null);
-
   const [dragOverOperation, setDragOverOperation] =
     React.useState<DragOverOperation | null>(null);
   const [itemOrders, setItemOrders] = React.useState<ItemOrder[]>([]);
 
   const applyDragStart = (dragIndex: number): void => {
-    setDragOperation({ dragIndex });
+    setDragOperation(createDragOperation(dragIndex));
   };
 
   const applyDragOver = (
     dragOverIndex: number,
     side?: targetSideType
   ): void => {
-    const newDragOverOperation: DragOverOperation = {
-      dragOverIndex,
-      newOrder:
-        side === 'before'
-          ? itemOrders[dragOverIndex].order - 1
-          : itemOrders[dragOverIndex].order + 1
-    };
-    if (
-      newDragOverOperation.dragOverIndex !==
-        (dragOperation?.dragIndex ?? -100) &&
-      newDragOverOperation.newOrder !== (dragOverOperation?.newOrder ?? -100)
-    ) {
-      setDragOverOperation(newDragOverOperation);
+    const newOperation = createDragOverOperation(dragOverIndex, itemOrders, side);
+    if (shouldUpdateDragOver(newOperation, dragOperation, dragOverOperation)) {
+      setDragOverOperation(newOperation);
     }
   };
 
   const applyDrop = (): void => {
     if (dragOperation && dragOverOperation) {
-      // Update the item in items order based on the dragOverOperation.
-      const copy = [...itemOrders];
-      copy[dragOperation.dragIndex].order = dragOverOperation.newOrder;
-
-      // Sort the itemOrders.
-      copy.sort((a, b) => a.order - b.order);
-      setItemOrders(copy);
-      // Create a new Items array ordered by itemOrders.
-      const newItems = copy.map((itemOrder) => items[itemOrder.index]);
-      // Set new the Items array to the state.
-      setItems(newItems);
-      // Reset the drag operations.
+      const newOrders = updateItemOrders(dragOperation, dragOverOperation, itemOrders);
+      setItemOrders(newOrders);
+      setItems(reorderItems(items, newOrders));
       setDragOperation(null);
       setDragOverOperation(null);
     }
@@ -108,37 +99,25 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
 
     const currentIndex =
       dragOverOperation?.dragOverIndex ?? dragOperation.dragIndex;
-    const dragOverIndex =
-      direction === 'up'
-        ? Math.max(0, currentIndex - 1)
-        : Math.min(items.length - 1, currentIndex + 1);
-    // console.log(
+    
+    const newDragOverOp = calculateMoveDragItem(
+      direction,
+      currentIndex,
+      itemOrders,
+      items.length - 1
+    );
 
-    if (dragOverIndex !== currentIndex) {
-      setDragOverOperation({
-        dragOverIndex,
-        newOrder:
-          direction === 'up'
-            ? itemOrders[dragOverIndex].order - 1
-            : itemOrders[dragOverIndex].order + 1
-      });
+    if (newDragOverOp) {
+      setDragOverOperation(newDragOverOp);
     }
   };
 
   const isDragItem = (listIndex: number): boolean => {
-    return (dragOperation?.dragIndex ?? -1) === listIndex;
+    return isDraggingItem(listIndex, dragOperation);
   };
 
   const getDropInsertPosition = (listIndex: number): InsertType => {
-    if (!dragOverOperation) {
-      return 'cant-insert-here';
-    }
-    if (dragOverOperation.dragOverIndex !== listIndex) {
-      return 'cant-insert-here';
-    }
-    return dragOverOperation.newOrder < itemOrders[listIndex].order
-      ? 'insert-before'
-      : 'insert-after';
+    return getDropPosition(listIndex, dragOverOperation, itemOrders);
   };
 
   const getNumberOfItems = (): number => {
@@ -146,11 +125,7 @@ export function DragProvider({ children, items, setItems }: DragProviderProps) {
   };
 
   React.useEffect(() => {
-    const initialOrders = items.map((_, index) => ({
-      index,
-      order: index * 2 + 1
-    }));
-    setItemOrders(initialOrders);
+    setItemOrders(createInitialOrders(items));
   }, [items]);
 
   return (
